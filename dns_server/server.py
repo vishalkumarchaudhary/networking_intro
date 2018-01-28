@@ -1,12 +1,15 @@
 from socket import *
+import sys
 
 
 def main():
+
+
 	serverPort = 53
-	server_ip='127.0.0.1'
+	
 	#creating udp server which is binded to port 53
 	serverSocket = socket(AF_INET, SOCK_DGRAM)
-	serverSocket.bind((server_ip, serverPort))
+	serverSocket.bind(('', serverPort))
 	print ("The server is ready to receive")
 	
 	 
@@ -24,13 +27,10 @@ def main():
 ### creating dns response 
 def get_dns_response(data):
 	header = get_header(data[:12])
-	domain , typ , clas ,query_index = get_query(data[12:])
+	domain , typ , clas ,dname_b = get_query(data[12:])
 	 
 	type_ = (1).to_bytes(2,byteorder='big')
 	class_ = (1).to_bytes(2,byteorder='big')
-	
-	
-	name =data[12:12+13]
 	
 	ttl = (400).to_bytes(4,byteorder='big')
 	rdlength = (4).to_bytes(2,byteorder='big')
@@ -38,7 +38,7 @@ def get_dns_response(data):
 	rdata = (12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')
 	
 	
-	return header  + data[12:12+13] +type_ +class_ +b'\xc0\x0c + type_ +class_ + ttl + rdlength+rdata
+	return header  + dname_b +'''data[12:12+13]''' +type_ +class_ +b'\xc0\x0c' + type_ +class_ + ttl + rdlength+rdata
 		
 	
 
@@ -106,12 +106,13 @@ def get_query(data):
 	left_data_to_parse =left_data_to_parse + 2
 	class_ = data[left_data_to_parse:left_data_to_parse+2]
 	
-	return (domain,type_ ,class_ ,data[:left_data_to_parse+2])
+	return (domain,type_ ,class_ ,data[:left_data_to_parse-2])
 	
 	
 
 ## main function call 
 if __name__=="__main__":
+	
 	main()
 	
 

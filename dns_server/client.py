@@ -1,14 +1,14 @@
 
 
 from socket import *
+import sys
 
-
-def main():
-	server_port = 53
-	serverName = '8.8.8.8'
+def main(domain_name='jamesbond.com',serverName='127.0.0.1'):
 	
+	server_port = 53
+
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
-	dns_req = get_packet_req()
+	dns_req = get_packet_req(domain_name)
 	
 	clientSocket.sendto(dns_req, ( serverName ,server_port) )
 	
@@ -25,10 +25,9 @@ def main():
 
 
 ### creating dns response 
-def get_packet_req():
+def get_packet_req(domain):
 	
 	header = get_header()
-	domain = 'howcode.org'
 	
 	encrypt_domain = encr_domain(domain)
 	
@@ -130,10 +129,15 @@ def slice_domain(data):
 	return data[left_data_to_parse:]
 
 ## main function call 
+## main function call 
 if __name__=="__main__":
-	main()
 	
-
+	try:
+	
+		main(sys.argv[1] , sys.argv[2]) #domain name / ip of server
+	except :
+		main()
+	
 
 
 		
