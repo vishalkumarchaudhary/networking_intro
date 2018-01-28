@@ -1,0 +1,16 @@
+DNS port running at 53
+when we host the server at port 53 it get the dns packet
+
+nc -u host.example.com 53  #client
+sudo nc -ul 127.0.0.1 53   #server
+
+
+packet
+
+
+1111
+
+
+
+
+
