@@ -5,15 +5,16 @@ from socket import *
 
 def main():
 	server_port = 53
-	serverName = '127.0.0.1'
+	serverName = '8.8.8.8'
 	
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
 	dns_req = get_packet_req()
 	
 	clientSocket.sendto(dns_req, ( serverName ,server_port) )
 	
-	data, server =clientSocket.recvfrom(512)
-	ip =get_domain_ip(data[12:])
+	data, server =clientSocket.recvfrom(1024)
+	
+	ip =get_domain_ip(data[12:] ,data[6:8]) # data[6:8] :- no. of answers
 	 
 	for i in ip:
 		print(i)
@@ -80,33 +81,36 @@ def set_flag():
 	OPCODE ='0000'  # standard query
 	AA ='0'
 	TC ='0'	#	truncation if packet is long
-	RD='0'
+	RD='1'
 	RA ='0'
 	Z='000'
-	RCODE = '0000'
+	RCODE = '0001'
 	
 	# 2 -Byte flag 
 	return int(QR+OPCODE+ AA + TC + RD + RA + Z + RCODE,2).to_bytes(2,byteorder='big')
 	
 ##extracting the domain form the query
-def get_domain_ip(data):
+def get_domain_ip(data ,ans_num):
  
 	data = slice_domain(data)
 	data = data[4:] #class ,type
- 
-	##	from answer
-	data = slice_domain(data)
-	data = data[4:] #class ,type
-	 
-	data = data[4+2:] ## ttl ,rdlength 
+	
 	ip=[]
-	tmp =''
-	for i in range(4):
-		tmp = tmp + str(int.from_bytes(data[i:i+1], byteorder='big'))+'.'
-	ip.append( tmp[:-1])
 	
+	##	from answer
+	for j in range(int.from_bytes(ans_num, byteorder='big')):
+		data = data[2:]
+		data = data[4:] #class ,type
+		 
+		data = data[4+2:] ## ttl ,rdlength 
 	
+		tmp =''
+		for i in range(4):
+			tmp = tmp + str(int.from_bytes(data[i:i+1], byteorder='big'))+'.'
+		ip.append( tmp[:-1])
+		data = data[4:]
 	
+
 	return ip
 	
 def slice_domain(data):

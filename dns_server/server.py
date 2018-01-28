@@ -38,7 +38,7 @@ def get_dns_response(data):
 	rdata = (12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')
 	
 	
-	return header  + data[12:12+13] +type_ +class_ +name + type_ +class_ + ttl + rdlength+rdata
+	return header  + data[12:12+13] +type_ +class_ +b'\xc0\x0c + type_ +class_ + ttl + rdlength+rdata
 		
 	
 
