@@ -44,7 +44,7 @@ def get_dns_response(data):
 	
 		return header  + dname_b  +type_ +class_ +b'\xc0\x0c' + type_ +class_ + ttl + rdlength+rdata
 	else :
-		header = get_header(data[:12],'11')
+		header = get_header(data[:12],'101')
 		domain , typ , clas ,dname_b = get_query(data[12:])
 		
 		return header  + dname_b  +type_ +class_
@@ -53,7 +53,7 @@ def get_dns_response(data):
 	
 
 ## creating header for the packet
-def get_header(data,error ='00'):
+def get_header(data,error ='000'):
 	# extracting transaction id for the request
 	transaction_id= data[:2]
 	
@@ -80,7 +80,7 @@ def set_flag(error):
 	RD='0'
 	RA ='0'
 	Z='000'
-	RCODE = '00'+error
+	RCODE = '0'+error
 	
 	# 2 -Byte flag 
 	return int(QR+OPCODE+ AA + TC + RD + RA + Z + RCODE,2).to_bytes(2,byteorder='big')

@@ -8,6 +8,8 @@ sudo nc -ul 127.0.0.1 53   #server
 packet
 
 
+run the server with the local ip specified otherwise it will give already used error
+
 1111
 
 

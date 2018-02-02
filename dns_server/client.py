@@ -13,7 +13,9 @@ def main(domain_name='jamesbond.com',serverName='127.0.0.1'):
 	clientSocket.sendto(dns_req, ( serverName ,server_port) )
 	
 	data, server =clientSocket.recvfrom(1024)
-	
+	if(data[3]==5 or data[3]==1 or data[3]>130 ):
+		print("name error")
+		return 0
 	ip =get_domain_ip(data[12:] ,data[6:8]) # data[6:8] :- no. of answers
 	 
 	for i in ip:
