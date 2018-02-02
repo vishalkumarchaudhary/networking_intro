@@ -4,12 +4,12 @@ import sys
 
 def main():
 
-
+	servername ='127.0.0.1'
 	serverPort = 53
 	
 	#creating udp server which is binded to port 53
 	serverSocket = socket(AF_INET, SOCK_DGRAM)
-	serverSocket.bind(('', serverPort))
+	serverSocket.bind((servername, serverPort))
 	print ("The server is ready to receive")
 	
 	 
@@ -26,29 +26,39 @@ def main():
 
 ### creating dns response 
 def get_dns_response(data):
+	domain_names={'jamesbond.com' : '12.12.12.12'}
+	
 	header = get_header(data[:12])
 	domain , typ , clas ,dname_b = get_query(data[12:])
-	 
 	type_ = (1).to_bytes(2,byteorder='big')
 	class_ = (1).to_bytes(2,byteorder='big')
-	
+
 	ttl = (400).to_bytes(4,byteorder='big')
 	rdlength = (4).to_bytes(2,byteorder='big')
+	if(domain[0]+'.'+domain[1] =='jamesbond.com'):
+		
 	
-	rdata = (12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')
+	
+		rdata = (12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')+(12).to_bytes(1,byteorder='big')
 	
 	
-	return header  + dname_b +'''data[12:12+13]''' +type_ +class_ +b'\xc0\x0c' + type_ +class_ + ttl + rdlength+rdata
+		return header  + dname_b  +type_ +class_ +b'\xc0\x0c' + type_ +class_ + ttl + rdlength+rdata
+	else :
+		header = get_header(data[:12],'11')
+		domain , typ , clas ,dname_b = get_query(data[12:])
+		
+		return header  + dname_b  +type_ +class_
+	
 		
 	
 
 ## creating header for the packet
-def get_header(data):
+def get_header(data,error ='00'):
 	# extracting transaction id for the request
 	transaction_id= data[:2]
 	
 	#setting flag (2-byte long)
-	flag = set_flag()
+	flag = set_flag(error)
 
 	QDCount = (1).to_bytes(2,byteorder='big')
 	ANCount = (1).to_bytes(2,byteorder='big')
@@ -61,7 +71,7 @@ def get_header(data):
 	
 	
 ##creating  flags
-def set_flag():
+def set_flag(error):
 	
 	QR ='1'	# Response(1)  query(0)
 	OPCODE ='0000'  # standard query
@@ -70,7 +80,7 @@ def set_flag():
 	RD='0'
 	RA ='0'
 	Z='000'
-	RCODE = '0000'
+	RCODE = '00'+error
 	
 	# 2 -Byte flag 
 	return int(QR+OPCODE+ AA + TC + RD + RA + Z + RCODE,2).to_bytes(2,byteorder='big')
